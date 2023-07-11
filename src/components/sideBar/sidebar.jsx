@@ -9,21 +9,20 @@ import { MdDashboard } from "react-icons/md";
 import { SiHomeassistantcommunitystore } from "react-icons/si";
 import { IoIosRestaurant } from "react-icons/io";
 import { AiFillSetting } from "react-icons/ai";
-import { HiChevronRight } from "react-icons/hi";
-import { HiChevronLeft } from "react-icons/hi";
-import { RiMenu2Line } from "react-icons/ri";
-// import { RiArrowDownSLine } from "react-icons/ri";
-// import { RiArrowUpSLine } from "react-icons/ri";
+import { HiChevronRight, HiChevronLeft } from "react-icons/hi";
+import { RiMenu2Line, RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 
 export const Sidebar = () => {
-  const login = JSON.parse(localStorage.getItem("login")) || [];
+  const login = JSON.parse(localStorage.getItem("user")) || [];
   const isShrinkView = useSelector((state) => state.shrink);
   const dispatch = useDispatch();
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const location = useLocation().pathname;
 
   const handleCategoryClick = (categoryId) => {
-    setActiveCategoryId(categoryId);
+    setActiveCategoryId((prevCategoryId) =>
+      prevCategoryId === categoryId ? null : categoryId
+    );
   };
 
   const handleSidebarView = () => {
@@ -42,7 +41,7 @@ export const Sidebar = () => {
         </button>
       </div>
       <ul className="menu_box">
-        {login.role === "owner"
+        {login.user.role === "owner"
           ? menu.map((item) => {
               return (
                 <div key={item.id}>
@@ -55,7 +54,14 @@ export const Sidebar = () => {
                     to={item.path}
                     onClick={() => handleCategoryClick(item.id)}
                   >
-                    <span>{item.icon}</span> <p>{item.name}</p>
+                    <span>{item.icon}</span> <p>{item.name}</p>{" "}
+                    <i style={item.list ? {} : { display: "none" }}>
+                      {activeCategoryId === item.id ? (
+                        <RiArrowDownSLine />
+                      ) : (
+                        <RiArrowUpSLine />
+                      )}
+                    </i>
                   </Link>
                   {item.id === activeCategoryId && (
                     <ul className="inner_menu">
@@ -93,6 +99,13 @@ export const Sidebar = () => {
                     onClick={() => handleCategoryClick(item.id)}
                   >
                     <span>{item.icon}</span> <p>{item.name}</p>
+                    <i style={item.list ? {} : { display: "none" }}>
+                      {activeCategoryId === item.id ? (
+                        <RiArrowDownSLine />
+                      ) : (
+                        <RiArrowUpSLine />
+                      )}
+                    </i>
                   </Link>
                   {item.id === activeCategoryId && (
                     <ul className="inner_menu">
@@ -128,25 +141,28 @@ const menu = [
     path: "/dashboard",
     name: "Dashboard",
     icon: <MdDashboard />,
+    list: false,
   },
   {
     id: "0765435",
-
     path: "/restaurant",
     name: "Restaurants",
     icon: <SiHomeassistantcommunitystore />,
+    list: true,
   },
   {
     id: "243567",
     path: "/add/product",
     name: "AddProduct",
     icon: <IoIosRestaurant />,
+    list: true,
   },
   {
     id: "765433",
     path: "/settings",
     name: "Settings",
     icon: <AiFillSetting />,
+    list: false,
   },
 ];
 const menu_customer = [
@@ -155,25 +171,28 @@ const menu_customer = [
     path: "/dashboard",
     name: "Dashboard",
     icon: <MdDashboard />,
+    list: false,
   },
   {
     id: "243567",
     path: "/add/product",
     name: "Add Product",
     icon: <IoIosRestaurant />,
+    list: true,
   },
   {
     id: "765433",
     path: "/settings",
     name: "Settings",
     icon: <AiFillSetting />,
+    list: false,
   },
 ];
 
 const category = [
   {
     id: "0765435",
-    name: "Add restoraund",
+    name: "Add restaurant",
     path: "/add",
   },
   {

@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { acLogin, acLogout } from "../redux/auth";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
-import axios from "axios";
+import { ClearForm } from "../service/form.service";
+import { ApiService } from "../service/api.service";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -16,18 +17,11 @@ export const Login = () => {
     const formData = new FormData(e.target);
     const loginData = Object.fromEntries(formData.entries());
 
-    const config = {
-      url: `https://yandex.sp-school58.uz/login/user`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: loginData,
-    };
-
-    axios(config)
+    ApiService.fetching("login/user", loginData)
       .then((res) => {
         console.log(res);
+        const user = res.data.innerData.user;
+        localStorage.setItem("user", JSON.stringify(user));
         dispatch(acLogin());
         navigate("/");
         setErr(false);
@@ -36,7 +30,7 @@ export const Login = () => {
         console.log(err);
         dispatch(acLogout());
         setErr(true);
-        document.querySelector("#form").reset();
+        ClearForm("#form");
       });
   };
 
@@ -110,26 +104,18 @@ export const Signin = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const loginData = Object.fromEntries(formData.entries());
-    localStorage.setItem("login", JSON.stringify(loginData));
-    document.querySelector("#form").reset();
-    navigate("/");
 
-    const config = {
-      url: `https://yandex.sp-school58.uz/register`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: loginData,
-    };
-
-    axios(config)
+    ApiService.fetching("register", loginData)
       .then((res) => {
         console.log(res);
+        const user = res.data.innerData.user;
+        localStorage.setItem("user", JSON.stringify(user));
+        ClearForm("#form");
       })
       .catch((err) => {
         console.log(err);
       });
+    navigate("/");
   };
 
   const [show, setShow] = useState(true);
